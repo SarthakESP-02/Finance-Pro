@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Pro</title>
+    <!-- Modern Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            color: #333;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #1e293b;
+            color: #f0f2f5;
+        }
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 30px 20px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            transition: background 0.3s;
+        }
+        body.dark .sidebar {
+            background: linear-gradient(135deg, #0f172a, #020617);
+        }
+        .sidebar h2 {
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #60a5fa;
+        }
+        .sidebar button {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .sidebar button:hover {
+            background: #60a5fa;
+            transform: translateX(8px) scale(1.02);
+        }
+        .sidebar button.active {
+            background: #3b82f6;
+            font-weight: 600;
+        }
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            transition: background 0.3s;
+        }
+        body.dark .content {
+            background: #0f172a;
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 16px;
+            animation: fadeIn 0.6s;
+        }
+        body.dark h1 {
+            color: #f0f2f5;
+        }
+        .intro-text {
+            font-size: 18px;
+            line-height: 1.7;
+            color: #64748b;
+            max-width: 800px;
+            animation: fadeIn 0.8s;
+        }
+        body.dark .intro-text {
+            color: #94a3b8;
+        }
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 600px;
+            margin: 30px auto 0;
+            transition: background 0.3s, box-shadow 0.3s;
+            animation: slideUp 0.5s ease;
+        }
+        body.dark .calculator {
+            background: #334155;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .calculator h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1e293b;
+        }
+        body.dark .calculator h3 {
+            color: #e2e8f0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #475569;
+        }
+        body.dark label {
+            color: #cbd5e1;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border 0.3s, background 0.3s;
+            background: white;
+        }
+        body.dark input, body.dark select {
+            background: #1e293b;
+            border-color: #475569;
+            color: #f0f2f5;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+        .calculator button {
+            width: 100%;
+            padding: 14px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .calculator button:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+        .calculator button:active {
+            animation: pulse 0.3s;
+        }
+        .result {
+            margin-top: 24px;
+            padding: 20px;
+            background: #eff6ff;
+            border-radius: 12px;
+            border-left: 5px solid #3b82f6;
+            display: none;
+            animation: fadeIn 0.6s;
+        }
+        body.dark .result {
+            background: #1e40af;
+            border-left-color: #60a5fa;
+        }
+        .result.active {
+            display: block;
+        }
+        .result p {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .result span {
+            font-weight: 700;
+            color: #1e40af;
+        }
+        body.dark .result span {
+            color: #93c5fd;
+        }
+        .portfolio-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+        .portfolio-item {
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        body.dark .portfolio-item {
+            background: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Finance Pro</h2>
+        <button data-tab="home" class="active">🏠 Home</button>
+        <button data-tab="loan">📊 Loan EMI</button>
+        <button data-tab="compound">💹 Compound Interest</button>
+        <button data-tab="budget">💰 Budget Tracker</button>
+        <button data-tab="currency">🌍 Currency Converter</button>
+        <button data-tab="retirement">🕰️ Retirement Planner</button>
+        <button data-tab="mortgage">🏠 Mortgage Calculator</button>
+        <button data-tab="savings">🎯 Savings Goal</button>
+        <button data-tab="portfolio">📈 Portfolio Tracker</button>
+        <button data-tab="tax">🧾 Tax Estimator</button>
+        <button data-tab="networth">💎 Net Worth</button>
+        <button data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <div class="content">
+        <section id="home" class="section active">
+            <h1>Welcome to Finance Pro</h1>
+            <p class="intro-text">
+                Your ultimate personal finance toolkit. Calculate loans, track investments, manage budgets, 
+                plan retirement, estimate taxes, and much more—all in one place.
+            </p>
+            <p class="intro-text">
+                Now with real-time currency conversion, dark mode, multi-language support, and enhanced animations for a smoother experience.
+            </p>
+        </section>
+
+        <section id="loan" class="section">
+            <div class="calculator">
+                <h3>Loan EMI Calculator</h3>
+                <label>Loan Amount</label>
+                <input type="number" id="loan-amount" placeholder="e.g., 200000">
+                <label>Annual Interest Rate (%)</label>
+                <input type="number" id="loan-rate" step="0.01" placeholder="e.g., 7.5">
+                <label>Loan Tenure (Years)</label>
+                <input type="number" id="loan-tenure" placeholder="e.g., 20">
+                <button onclick="calculateLoan()">Calculate Monthly EMI</button>
+                <div id="loan-result" class="result">
+                    <p>Monthly EMI: <span id="emi">$0</span></p>
+                    <p>Total Payment: <span id="total-payment">$0</span></p>
+                    <p>Total Interest Paid: <span id="total-interest">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="compound" class="section">
+            <div class="calculator">
+                <h3>Compound Interest Calculator</h3>
+                <label>Principal Amount</label>
+                <input type="number" id="principal" placeholder="e.g., 10000">
+                <label>Annual Interest Rate (%)</label>
+                <input type="number" id="rate" step="0.01" placeholder="e.g., 8">
+                <label>Time Period (Years)</label>
+                <input type="number" id="time" placeholder="e.g., 10">
+                <label>Compounded</label>
+                <input type="number" id="compounds" value="12" placeholder="12 = monthly">
+                <button onclick="calculateCompound()">Calculate Growth</button>
+                <div id="compound-result" class="result">
+                    <p>Future Value: <span id="future-value">$0</span></p>
+                    <p>Interest Earned: <span id="interest-earned">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="budget" class="section">
+            <div class="calculator">
+                <h3>Monthly Budget Tracker</h3>
+                <label>Monthly Income</label>
+                <input type="number" id="income" placeholder="e.g., 5000">
+                <label>Expenses (comma-separated)</label>
+                <input type="text" id="expenses" placeholder="e.g., 1200, 800, 500, 300">
+                <label>Expense Categories (comma-separated, optional)</label>
+                <input type="text" id="expense-categories" placeholder="e.g., Rent, Food, Transport, Entertainment">
+                <button onclick="calculateBudget()">Analyze Budget</button>
+                <div id="budget-result" class="result">
+                    <p>Total Expenses: <span id="total-expenses">$0</span></p>
+                    <p>Remaining / Surplus: <span id="balance">$0</span></p>
+                    <p id="category-breakdown"></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="currency" class="section">
+            <div class="calculator">
+                <h3>Currency Converter</h3>
+                <label>Amount</label>
+                <input type="number" id="convert-amount" value="1">
+                <label>From Currency</label>
+                <select id="from-currency">
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="JPY">JPY - Japanese Yen</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="CHF">CHF - Swiss Franc</option>
+                    <option value="CNY">CNY - Chinese Yuan</option>
+                    <option value="INR">INR - Indian Rupee</option>
+                    <option value="BRL">BRL - Brazilian Real</option>
+                    <option value="MXN">MXN - Mexican Peso</option>
+                    <option value="ZAR">ZAR - South African Rand</option>
+                    <option value="RUB">RUB - Russian Ruble</option>
+                    <option value="KRW">KRW - South Korean Won</option>
+                    <option value="SEK">SEK - Swedish Krona</option>
+                    <!-- Add more as needed -->
+                </select>
+                <label>To Currency</label>
+                <select id="to-currency">
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="JPY">JPY - Japanese Yen</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="CHF">CHF - Swiss Franc</option>
+                    <option value="CNY">CNY - Chinese Yuan</option>
+                    <option value="INR">INR - Indian Rupee</option>
+                    <option value="BRL">BRL - Brazilian Real</option>
+                    <option value="MXN">MXN - Mexican Peso</option>
+                    <option value="ZAR">ZAR - South African Rand</option>
+                    <option value="RUB">RUB - Russian Ruble</option>
+                    <option value="KRW">KRW - South Korean Won</option>
+                    <option value="SEK">SEK - Swedish Krona</option>
+                    <!-- Add more as needed -->
+                </select>
+                <button onclick="convertCurrency()">Convert</button>
+                <div id="currency-result" class="result">
+                    <p>Converted Amount: <span id="converted">0</span></p>
+                    <p>Last Updated: <span id="rate-date"></span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="retirement" class="section">
+            <div class="calculator">
+                <h3>Retirement Planner</h3>
+                <label>Current Age</label>
+                <input type="number" id="current-age" placeholder="e.g., 30">
+                <label>Retirement Age</label>
+                <input type="number" id="retirement-age" placeholder="e.g., 65">
+                <label>Current Savings</label>
+                <input type="number" id="current-savings" placeholder="e.g., 50000">
+                <label>Annual Contribution</label>
+                <input type="number" id="annual-contribution" placeholder="e.g., 10000">
+                <label>Expected Annual Return (%)</label>
+                <input type="number" id="retirement-return" step="0.01" placeholder="e.g., 7">
+                <label>Annual Expenses in Retirement</label>
+                <input type="number" id="retirement-expenses" placeholder="e.g., 40000">
+                <button onclick="calculateRetirement()">Plan Retirement</button>
+                <div id="retirement-result" class="result">
+                    <p>Projected Savings at Retirement: <span id="projected-savings">$0</span></p>
+                    <p>Years of Retirement Funded: <span id="funded-years">0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="mortgage" class="section">
+            <div class="calculator">
+                <h3>Mortgage Calculator</h3>
+                <label>Home Price</label>
+                <input type="number" id="home-price" placeholder="e.g., 300000">
+                <label>Down Payment (%)</label>
+                <input type="number" id="down-payment" step="0.01" placeholder="e.g., 20">
+                <label>Interest Rate (%)</label>
+                <input type="number" id="mortgage-rate" step="0.01" placeholder="e.g., 4.5">
+                <label>Loan Term (Years)</label>
+                <input type="number" id="mortgage-term" placeholder="e.g., 30">
+                <label>Annual Property Tax (%)</label>
+                <input type="number" id="property-tax" step="0.01" placeholder="e.g., 1.2">
+                <label>Annual Insurance</label>
+                <input type="number" id="insurance" placeholder="e.g., 1200">
+                <button onclick="calculateMortgage()">Calculate Mortgage</button>
+                <div id="mortgage-result" class="result">
+                    <p>Monthly Payment: <span id="monthly-payment">$0</span></p>
+                    <p>Total Cost: <span id="total-cost">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="savings" class="section">
+            <div class="calculator">
+                <h3>Savings Goal Planner</h3>
+                <label>Goal Amount</label>
+                <input type="number" id="goal-amount" placeholder="e.g., 20000">
+                <label>Current Savings</label>
+                <input type="number" id="initial-savings" placeholder="e.g., 5000">
+                <label>Monthly Contribution</label>
+                <input type="number" id="monthly-contribution" placeholder="e.g., 500">
+                <label>Annual Interest Rate (%)</label>
+                <input type="number" id="savings-rate" step="0.01" placeholder="e.g., 5">
+                <button onclick="calculateSavings()">Plan Goal</button>
+                <div id="savings-result" class="result">
+                    <p>Months to Reach Goal: <span id="months-to-goal">0</span></p>
+                    <p>Total Contributions: <span id="total-contributions">$0</span></p>
+                    <p>Interest Earned: <span id="savings-interest">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="section">
+            <div class="calculator">
+                <h3>Investment Portfolio Tracker</h3>
+                <p>Add investments (e.g., Stock: AAPL, Shares: 10, Price: 150)</p>
+                <label>Investment Name</label>
+                <input type="text" id="inv-name" placeholder="e.g., AAPL">
+                <label>Quantity</label>
+                <input type="number" id="inv-quantity" placeholder="e.g., 10">
+                <label>Current Price</label>
+                <input type="number" id="inv-price" placeholder="e.g., 150">
+                <button onclick="addInvestment()">Add Investment</button>
+                <ul id="portfolio-list" class="portfolio-list"></ul>
+                <div id="portfolio-result" class="result">
+                    <p>Total Portfolio Value: <span id="total-portfolio">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tax" class="section">
+            <div class="calculator">
+                <h3>Tax Estimator (US Simplified)</h3>
+                <label>Annual Income</label>
+                <input type="number" id="annual-income" placeholder="e.g., 80000">
+                <label>Filing Status</label>
+                <select id="filing-status">
+                    <option value="single">Single</option>
+                    <option value="married">Married Filing Jointly</option>
+                    <option value="head">Head of Household</option>
+                </select>
+                <label>Deductions</label>
+                <input type="number" id="deductions" placeholder="e.g., 12550 (standard)">
+                <button onclick="estimateTax()">Estimate Tax</button>
+                <div id="tax-result" class="result">
+                    <p>Estimated Federal Tax: <span id="estimated-tax">$0</span></p>
+                    <p>Effective Tax Rate: <span id="tax-rate">0%</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="networth" class="section">
+            <div class="calculator">
+                <h3>Net Worth Calculator</h3>
+                <label>Assets (comma-separated values)</label>
+                <input type="text" id="assets" placeholder="e.g., 100000, 50000, 20000">
+                <label>Liabilities (comma-separated values)</label>
+                <input type="text" id="liabilities" placeholder="e.g., 50000, 10000">
+                <button onclick="calculateNetWorth()">Calculate Net Worth</button>
+                <div id="networth-result" class="result">
+                    <p>Total Assets: <span id="total-assets">$0</span></p>
+                    <p>Total Liabilities: <span id="total-liabilities">$0</span></p>
+                    <p>Net Worth: <span id="net-worth">$0</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="settings" class="section">
+            <div class="calculator">
+                <h3>App Settings</h3>
+                <label>Language</label>
+                <select id="language-select" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="zh">中文</option>
+                </select>
+                <label>Theme</label>
+                <select id="theme-select" onchange="changeTheme()">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+                <label>Default Currency</label>
+                <select id="default-currency" onchange="updateDefaultCurrency()">
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="INR">INR - Indian Rupee 🇮🇳</option>
+                    <option value="JPY">JPY - Japanese Yen</option>
+                    <option value="AUD">AUD - Australian Dollar</option>
+                    <option value="CAD">CAD - Canadian Dollar</option>
+                    <option value="CHF">CHF - Swiss Franc</option>
+                    <option value="CNY">CNY - Chinese Yuan</option>
+                    <option value="SGD">SGD - Singapore Dollar</option>
+                    <!-- More can be added -->
+                    <!-- Sync with converter options -->
+                </select>
+                <p>Changes apply immediately. More customizations coming soon!</p>
+            </div>
+        </section>
+    </div>
+
+    <script type="module">
+        // Translations Object (Basic i18n)
+        const translations = {
+            en: {
+                welcome: 'Welcome to Finance Pro',
+                intro1: 'Your ultimate personal finance toolkit. Calculate loans, track investments, manage budgets, plan retirement, estimate taxes, and much more—all in one place.',
+                intro2: 'Now with real-time currency conversion, dark mode, multi-language support, and enhanced animations for a smoother experience.',
+                loanTitle: 'Loan EMI Calculator',
+                compoundTitle: 'Compound Interest Calculator',
+                budgetTitle: 'Monthly Budget Tracker',
+                currencyTitle: 'Currency Converter',
+                retirementTitle: 'Retirement Planner',
+                mortgageTitle: 'Mortgage Calculator',
+                savingsTitle: 'Savings Goal Planner',
+                portfolioTitle: 'Investment Portfolio Tracker',
+                taxTitle: 'Tax Estimator (US Simplified)',
+                networthTitle: 'Net Worth Calculator',
+                settingsTitle: 'App Settings',
+                // Add more as needed
+            },
+            es: {
+                welcome: 'Bienvenido a Finance Pro',
+                intro1: 'Tu kit de herramientas de finanzas personales definitivo. Calcula préstamos, rastrea inversiones, gestiona presupuestos, planea la jubilación, estima impuestos y mucho más—todo en un solo lugar.',
+                intro2: 'Ahora con conversión de divisas en tiempo real, modo oscuro, soporte multilingüe y animaciones mejoradas para una experiencia más fluida.',
+                loanTitle: 'Calculadora de EMI de Préstamo',
+                compoundTitle: 'Calculadora de Interés Compuesto',
+                budgetTitle: 'Rastreador de Presupuesto Mensual',
+                currencyTitle: 'Convertidor de Divisas',
+                retirementTitle: 'Planificador de Jubilación',
+                mortgageTitle: 'Calculadora de Hipoteca',
+                savingsTitle: 'Planificador de Meta de Ahorros',
+                portfolioTitle: 'Rastreador de Portafolio de Inversiones',
+                taxTitle: 'Estimador de Impuestos (EE.UU. Simplificado)',
+                networthTitle: 'Calculadora de Patrimonio Neto',
+                settingsTitle: 'Configuraciones de la App',
+            },
+            fr: {
+                welcome: 'Bienvenue sur Finance Pro',
+                intro1: 'Votre toolkit ultime pour les finances personnelles. Calculez les prêts, suivez les investissements, gérez les budgets, planifiez la retraite, estimez les impôts et bien plus—tout en un seul endroit.',
+                intro2: 'Maintenant avec conversion de devises en temps réel, mode sombre, support multilingue et animations améliorées pour une expérience plus fluide.',
+                loanTitle: 'Calculateur EMI de Prêt',
+                compoundTitle: 'Calculateur d\'Intérêt Composé',
+                budgetTitle: 'Suivi de Budget Mensuel',
+                currencyTitle: 'Convertisseur de Devises',
+                retirementTitle: 'Planificateur de Retraite',
+                mortgageTitle: 'Calculateur d\'Hypothèque',
+                savingsTitle: 'Planificateur d\'Objectif d\'Épargne',
+                portfolioTitle: 'Suivi de Portefeuille d\'Investissement',
+                taxTitle: 'Estimateur d\'Impôts (US Simplifié)',
+                networthTitle: 'Calculateur de Valeur Nette',
+                settingsTitle: 'Paramètres de l\'App',
+            },
+            de: {
+                welcome: 'Willkommen bei Finance Pro',
+                intro1: 'Ihr ultimativer Toolkit für persönliche Finanzen. Berechnen Sie Kredite, verfolgen Sie Investitionen, verwalten Sie Budgets, planen Sie den Ruhestand, schätzen Sie Steuern und vieles mehr—alles an einem Ort.',
+                intro2: 'Jetzt mit Echtzeit-Währungsumrechnung, Dark Mode, Mehrsprachensupport und verbesserten Animationen für ein reibungsloseres Erlebnis.',
+                loanTitle: 'Kredit-EMI-Rechner',
+                compoundTitle: 'Zinseszins-Rechner',
+                budgetTitle: 'Monatlicher Budget-Tracker',
+                currencyTitle: 'Währungsumrechner',
+                retirementTitle: 'Ruhestandsplaner',
+                mortgageTitle: 'Hypothekenrechner',
+                savingsTitle: 'Sparziel-Planer',
+                portfolioTitle: 'Investitionsportfolio-Tracker',
+                taxTitle: 'Steuerschätzer (US Vereinfacht)',
+                networthTitle: 'Nettovermögen-Rechner',
+                settingsTitle: 'App-Einstellungen',
+            },
+            zh: {
+                welcome: '欢迎使用 Finance Pro',
+                intro1: '您的终极个人财务工具包。计算贷款、跟踪投资、管理预算、规划退休、估算税费等等——一切尽在一个地方。',
+                intro2: '现在配备实时货币转换、暗黑模式、多语言支持以及增强动画，提供更流畅的体验。',
+                loanTitle: '贷款 EMI 计算器',
+                compoundTitle: '复利计算器',
+                budgetTitle: '月度预算跟踪器',
+                currencyTitle: '货币转换器',
+                retirementTitle: '退休规划器',
+                mortgageTitle: '抵押计算器',
+                savingsTitle: '储蓄目标规划器',
+                portfolioTitle: '投资组合跟踪器',
+                taxTitle: '税费估算器（美国简化版）',
+                networthTitle: '净资产计算器',
+                settingsTitle: '应用设置',
+            }
+        };
+
+        let currentLang = 'en';
+        let currentTheme = 'light';
+        let defaultCurrency = 'USD';
+
+        // Tab Switching
+        document.querySelectorAll('.sidebar button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.dataset.tab;
+
+                document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.toggle('active', section.id === tabId);
+                });
+            });
+        });
+
+        // Language Change
+        window.changeLanguage = function() {
+            currentLang = document.getElementById('language-select').value;
+            updateTexts();
+        };
+
+        function updateTexts() {
+            const t = translations[currentLang];
+            document.querySelector('#home h1').textContent = t.welcome;
+            document.querySelectorAll('.intro-text')[0].textContent = t.intro1;
+            document.querySelectorAll('.intro-text')[1].textContent = t.intro2;
+            document.querySelector('#loan h3').textContent = t.loanTitle;
+            document.querySelector('#compound h3').textContent = t.compoundTitle;
+            document.querySelector('#budget h3').textContent = t.budgetTitle;
+            document.querySelector('#currency h3').textContent = t.currencyTitle;
+            document.querySelector('#retirement h3').textContent = t.retirementTitle;
+            document.querySelector('#mortgage h3').textContent = t.mortgageTitle;
+            document.querySelector('#savings h3').textContent = t.savingsTitle;
+            document.querySelector('#portfolio h3').textContent = t.portfolioTitle;
+            document.querySelector('#tax h3').textContent = t.taxTitle;
+            document.querySelector('#networth h3').textContent = t.networthTitle;
+            document.querySelector('#settings h3').textContent = t.settingsTitle;
+            // Update labels etc. if more detailed
+        }
+
+        // Theme Change
+        window.changeTheme = function() {
+            currentTheme = document.getElementById('theme-select').value;
+            document.body.classList.toggle('dark', currentTheme === 'dark');
+        };
+
+        // Default Currency Update
+        window.updateDefaultCurrency = function() {
+            defaultCurrency = document.getElementById('default-currency').value;
+            document.getElementById('from-currency').value = defaultCurrency;
+        };
+
+        // Loan Calculator
+        window.calculateLoan = function() {
+            const amount = parseFloat(document.getElementById('loan-amount').value);
+            const annualRate = parseFloat(document.getElementById('loan-rate').value);
+            const years = parseFloat(document.getElementById('loan-tenure').value);
+
+            if (!amount || !annualRate || !years) return alert('Please fill all fields');
+
+            const monthlyRate = annualRate / 100 / 12;
+            const months = years * 12;
+            const emi = (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+            const totalPayment = emi * months;
+            const totalInterest = totalPayment - amount;
+
+            document.getElementById('emi').textContent = `${defaultCurrency} ${emi.toFixed(2)}`;
+            document.getElementById('total-payment').textContent = `${defaultCurrency} ${totalPayment.toFixed(2)}`;
+            document.getElementById('total-interest').textContent = `${defaultCurrency} ${totalInterest.toFixed(2)}`;
+            document.getElementById('loan-result').classList.add('active');
+        };
+
+        // Compound Interest
+        window.calculateCompound = function() {
+            const p = parseFloat(document.getElementById('principal').value);
+            const r = parseFloat(document.getElementById('rate').value) / 100;
+            const t = parseFloat(document.getElementById('time').value);
+            const n = parseFloat(document.getElementById('compounds').value) || 1;
+
+            if (!p || !r || !t) return alert('Please fill required fields');
+
+            const amount = p * Math.pow((1 + r/n), n * t);
+            const interest = amount - p;
+
+            document.getElementById('future-value').textContent = `${defaultCurrency} ${amount.toFixed(2)}`;
+            document.getElementById('interest-earned').textContent = `${defaultCurrency} ${interest.toFixed(2)}`;
+            document.getElementById('compound-result').classList.add('active');
+        };
+
+        // Budget Tracker
+        window.calculateBudget = function() {
+            const income = parseFloat(document.getElementById('income').value);
+            const expensesInput = document.getElementById('expenses').value;
+            const categoriesInput = document.getElementById('expense-categories').value;
+            const expenses = expensesInput.split(',').map(e => parseFloat(e.trim())).filter(e => !isNaN(e));
+            const categories = categoriesInput.split(',').map(c => c.trim()).filter(c => c);
+
+            if (!income || expenses.length === 0) return alert('Enter income and at least one expense');
+
+            const totalExp = expenses.reduce((a,b) => a + b, 0);
+            const balance = income - totalExp;
+
+            document.getElementById('total-expenses').textContent = `${defaultCurrency} ${totalExp.toFixed(2)}`;
+            document.getElementById('balance').textContent = `${defaultCurrency} ${balance.toFixed(2)}`;
+
+            let breakdown = 'Category Breakdown:<br>';
+            expenses.forEach((exp, i) => {
+                const cat = categories[i] || `Expense ${i+1}`;
+                breakdown += `${cat}: ${defaultCurrency} ${exp.toFixed(2)}<br>`;
+            });
+            document.getElementById('category-breakdown').innerHTML = breakdown;
+
+            document.getElementById('budget-result').classList.add('active');
+        };
+
+       // FIXED Currency Converter - Now using Frankfurter API (reliable & free forever)
+        window.convertCurrency = async function() {
+            const amount = parseFloat(document.getElementById('convert-amount').value) || 1;
+            const from = document.getElementById('from-currency').value;
+            const to = document.getElementById('to-currency').value;
+
+            if (from === to) {
+                document.getElementById('converted').textContent = `${amount.toFixed(2)} ${to}`;
+                document.getElementById('rate-date').textContent = 'Same currency';
+                document.getElementById('currency-result').classList.add('active');
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+                const data = await response.json();
+
+                if (data.rates && data.rates[to]) {
+                    const rate = data.rates[to];
+                    const converted = amount * rate;
+                    document.getElementById('converted').textContent = `${converted.toFixed(4)} ${to}`;
+                    document.getElementById('rate-date').textContent = data.date;
+                    document.getElementById('currency-result').classList.add('active');
+                } else {
+                    alert('Currency pair not supported yet. Try common ones like USD, EUR, INR, GBP.');
+                }
+            } catch (error) {
+                alert('Network error - check your internet and try again!');
+            }
+        };
+
+        // Retirement Planner
+        window.calculateRetirement = function() {
+            const currentAge = parseFloat(document.getElementById('current-age').value);
+            const retirementAge = parseFloat(document.getElementById('retirement-age').value);
+            const currentSavings = parseFloat(document.getElementById('current-savings').value) || 0;
+            const annualContribution = parseFloat(document.getElementById('annual-contribution').value) || 0;
+            const annualReturn = parseFloat(document.getElementById('retirement-return').value) / 100;
+            const annualExpenses = parseFloat(document.getElementById('retirement-expenses').value);
+
+            if (!currentAge || !retirementAge || !annualReturn || !annualExpenses) return alert('Fill required fields');
+
+            const yearsToRetire = retirementAge - currentAge;
+            let projected = currentSavings;
+            for (let i = 0; i < yearsToRetire; i++) {
+                projected = (projected + annualContribution) * (1 + annualReturn);
+            }
+            const fundedYears = Math.floor(projected / annualExpenses);
+
+            document.getElementById('projected-savings').textContent = `${defaultCurrency} ${projected.toFixed(2)}`;
+            document.getElementById('funded-years').textContent = fundedYears;
+            document.getElementById('retirement-result').classList.add('active');
+        };
+
+        // Mortgage Calculator
+        window.calculateMortgage = function() {
+            const price = parseFloat(document.getElementById('home-price').value);
+            const downPct = parseFloat(document.getElementById('down-payment').value) / 100;
+            const rate = parseFloat(document.getElementById('mortgage-rate').value) / 100 / 12;
+            const term = parseFloat(document.getElementById('mortgage-term').value) * 12;
+            const taxPct = parseFloat(document.getElementById('property-tax').value) / 100 / 12;
+            const insurance = parseFloat(document.getElementById('insurance').value) / 12;
+
+            if (!price || !rate || !term) return alert('Fill required fields');
+
+            const loanAmount = price * (1 - downPct);
+            const principalInterest = (loanAmount * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+            const tax = price * taxPct;
+            const monthlyPayment = principalInterest + tax + insurance;
+            const totalCost = monthlyPayment * term;
+
+            document.getElementById('monthly-payment').textContent = `${defaultCurrency} ${monthlyPayment.toFixed(2)}`;
+            document.getElementById('total-cost').textContent = `${defaultCurrency} ${totalCost.toFixed(2)}`;
+            document.getElementById('mortgage-result').classList.add('active');
+        };
+
+        // Savings Goal
+        window.calculateSavings = function() {
+            const goal = parseFloat(document.getElementById('goal-amount').value);
+            let initial = parseFloat(document.getElementById('initial-savings').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthly-contribution').value) || 0;
+            const rate = parseFloat(document.getElementById('savings-rate').value) / 100 / 12;
+
+            if (!goal) return alert('Enter goal amount');
+
+            let months = 0;
+            let totalContrib = initial;
+            let interest = 0;
+            while (initial < goal) {
+                const monthlyInterest = initial * rate;
+                initial += monthlyInterest + monthly;
+                interest += monthlyInterest;
+                totalContrib += monthly;
+                months++;
+                if (months > 1200) break; // Prevent infinite loop
+            }
+
+            document.getElementById('months-to-goal').textContent = months;
+            document.getElementById('total-contributions').textContent = `${defaultCurrency} ${totalContrib.toFixed(2)}`;
+            document.getElementById('savings-interest').textContent = `${defaultCurrency} ${interest.toFixed(2)}`;
+            document.getElementById('savings-result').classList.add('active');
+        };
+
+        // Portfolio Tracker
+        let investments = [];
+        window.addInvestment = function() {
+            const name = document.getElementById('inv-name').value;
+            const quantity = parseFloat(document.getElementById('inv-quantity').value);
+            const price = parseFloat(document.getElementById('inv-price').value);
+
+            if (!name || !quantity || !price) return alert('Fill all fields');
+
+            investments.push({name, quantity, price});
+            updatePortfolio();
+        };
+
+        function updatePortfolio() {
+            const list = document.getElementById('portfolio-list');
+            list.innerHTML = '';
+            let totalValue = 0;
+            investments.forEach(inv => {
+                const value = inv.quantity * inv.price;
+                totalValue += value;
+                const li = document.createElement('li');
+                li.className = 'portfolio-item';
+                li.textContent = `${inv.name}: ${inv.quantity} @ ${defaultCurrency} ${inv.price.toFixed(2)} = ${defaultCurrency} ${value.toFixed(2)}`;
+                list.appendChild(li);
+            });
+            document.getElementById('total-portfolio').textContent = `${defaultCurrency} ${totalValue.toFixed(2)}`;
+            document.getElementById('portfolio-result').classList.add('active');
+        }
+
+        // Tax Estimator (Simplified US Brackets 2025)
+        window.estimateTax = function() {
+            const income = parseFloat(document.getElementById('annual-income').value);
+            const status = document.getElementById('filing-status').value;
+            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+
+            if (!income) return alert('Enter income');
+
+            const taxable = Math.max(0, income - deductions);
+            let brackets;
+            if (status === 'single') {
+                brackets = [
+                    {rate: 0.10, min: 0, max: 11000},
+                    {rate: 0.12, min: 11001, max: 44725},
+                    {rate: 0.22, min: 44726, max: 95375},
+                    {rate: 0.24, min: 95376, max: 182100},
+                    {rate: 0.32, min: 182101, max: 231250},
+                    {rate: 0.35, min: 231251, max: 578125},
+                    {rate: 0.37, min: 578126, max: Infinity}
+                ];
+            } else if (status === 'married') {
+                brackets = [
+                    {rate: 0.10, min: 0, max: 22000},
+                    {rate: 0.12, min: 22001, max: 89450},
+                    {rate: 0.22, min: 89451, max: 190750},
+                    {rate: 0.24, min: 190751, max: 364200},
+                    {rate: 0.32, min: 364201, max: 462500},
+                    {rate: 0.35, min: 462501, max: 693750},
+                    {rate: 0.37, min: 693751, max: Infinity}
+                ];
+            } else { // head
+                brackets = [
+                    {rate: 0.10, min: 0, max: 15700},
+                    {rate: 0.12, min: 15701, max: 59850},
+                    {rate: 0.22, min: 59851, max: 95350},
+                    {rate: 0.24, min: 95351, max: 182100},
+                    {rate: 0.32, min: 182101, max: 231250},
+                    {rate: 0.35, min: 231251, max: 578100},
+                    {rate: 0.37, min: 578101, max: Infinity}
+                ];
+            }
+
+            let tax = 0;
+            brackets.forEach(b => {
+                if (taxable > b.min) {
+                    const upper = Math.min(taxable, b.max);
+                    tax += (upper - b.min) * b.rate;
+                }
+            });
+
+            const rate = (tax / income) * 100;
+            document.getElementById('estimated-tax').textContent = `${defaultCurrency} ${tax.toFixed(2)}`;
+            document.getElementById('tax-rate').textContent = `${rate.toFixed(2)}%`;
+            document.getElementById('tax-result').classList.add('active');
+        };
+
+        // Net Worth
+        window.calculateNetWorth = function() {
+            const assetsStr = document.getElementById('assets').value;
+            const liabilitiesStr = document.getElementById('liabilities').value;
+            const assets = assetsStr.split(',').map(a => parseFloat(a.trim())).filter(a => !isNaN(a));
+            const liabilities = liabilitiesStr.split(',').map(l => parseFloat(l.trim())).filter(l => !isNaN(l));
+
+            const totalAssets = assets.reduce((a,b) => a + b, 0);
+            const totalLiab = liabilities.reduce((a,b) => a + b, 0);
+            const net = totalAssets - totalLiab;
+
+            document.getElementById('total-assets').textContent = `${defaultCurrency} ${totalAssets.toFixed(2)}`;
+            document.getElementById('total-liabilities').textContent = `${defaultCurrency} ${totalLiab.toFixed(2)}`;
+            document.getElementById('net-worth').textContent = `${defaultCurrency} ${net.toFixed(2)}`;
+            document.getElementById('networth-result').classList.add('active');
+        };
+    </script>
+</body>
+</html>
