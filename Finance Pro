@@ -494,24 +494,10 @@
             </div>
         </section>
 
-        <section id="networth" class="section">
-            <div class="calculator">
-                <h3>Net Worth Calculator</h3>
-                <label>Assets (comma-separated values)</label>
-                <input type="text" id="assets" placeholder="e.g., 100000, 50000, 20000">
-                <label>Liabilities (comma-separated values)</label>
-                <input type="text" id="liabilities" placeholder="e.g., 50000, 10000">
-                <button onclick="calculateNetWorth()">Calculate Net Worth</button>
-                <div id="networth-result" class="result">
-                    <p>Total Assets: <span id="total-assets">$0</span></p>
-                    <p>Total Liabilities: <span id="total-liabilities">$0</span></p>
-                    <p>Net Worth: <span id="net-worth">$0</span></p>
-                </div>
-            </div>
-        </section>
-                        <section id="settings" class="section">
+                              <section id="settings" class="section">
             <div class="calculator">
                 <h3>App Settings</h3>
+                
                 <label>Language</label>
                 <select id="language-select" onchange="changeLanguage()">
                     <option value="en">English</option>
@@ -520,11 +506,13 @@
                     <option value="de">Deutsch</option>
                     <option value="zh">中文</option>
                 </select>
+
                 <label>Theme</label>
                 <select id="theme-select" onchange="changeTheme()">
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
                 </select>
+
                 <label>Default Currency</label>
                 <select id="default-currency" onchange="updateDefaultCurrency()">
                     <option value="USD">USD - US Dollar</option>
@@ -539,39 +527,25 @@
                     <option value="SGD">SGD - Singapore Dollar</option>
                 </select>
 
-                <!-- Fixed & Clean Export/Import Section -->
-                <div style="margin: 40px 0 20px; height: 1px; background: #cbd5e1;"></div>
-                <h3 style="margin-bottom: 20px;">Backup & Restore Data</h3>
+                <div style="margin: 40px 0; height: 1px; background: #cbd5e1;"></div>
+
+                <h3>Backup & Restore Data</h3>
                 
-                <button style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-bottom:20px;" onclick="exportData()">
+                <button style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin:20px 0;" onclick="exportData()">
                     📥 Export All Data (Download JSON)
                 </button>
-                
+
                 <div style="text-align:center;">
-                    <input type="file" id="import-file" accept=".json" style="display:block; margin:15px auto; padding:10px; width:100%; max-width:400px;">
-                    <button style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer;" onclick="importData()">
-                        📤 Import Data from File
+                    <label for="import-file" style="display:block; margin-bottom:10px;">Choose JSON file to import</label>
+                    <input type="file" id="import-file" accept=".json">
+                    <button style="width:100%; padding:14px; background:#3b82f6; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; margin-top:10px;" onclick="importData()">
+                        📤 Import Data
                     </button>
                 </div>
-                
-                <p style="margin-top:20px; font-size:14px; color:#64748b; text-align:center;">
-                    Export saves your portfolio and settings. Import restores everything instantly.
+
+                <p style="margin-top:30px; font-size:14px; color:#64748b; text-align:center;">
+                    Export saves your portfolio and settings. Import restores everything.
                 </p>
-            </div>
-        </section>
-                <select id="default-currency" onchange="updateDefaultCurrency()">
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="INR">INR - Indian Rupee 🇮🇳</option>
-                    <option value="JPY">JPY - Japanese Yen</option>
-                    <option value="AUD">AUD - Australian Dollar</option>
-                    <option value="CAD">CAD - Canadian Dollar</option>
-                    <option value="CHF">CHF - Swiss Franc</option>
-                    <option value="CNY">CNY - Chinese Yuan</option>
-                    <option value="SGD">SGD - Singapore Dollar</option>
-                </select>
-                <p>Changes apply immediately. More customizations coming soon!</p>
             </div>
         </section>
 
@@ -987,5 +961,4 @@
     </script>
 </body>
 </html>
-
 
