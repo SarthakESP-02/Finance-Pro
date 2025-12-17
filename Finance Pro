@@ -708,10 +708,14 @@
             document.body.classList.toggle('dark', currentTheme === 'dark');
         };
 
-        // Default Currency Update
         window.updateDefaultCurrency = function() {
-            defaultCurrency = document.getElementById('default-currency').value;
-            document.getElementById('from-currency').value = defaultCurrency;
+    defaultCurrency = document.getElementById('default-currency').value;
+    
+    // Safe: only update if the element exists
+    const fromSelect = document.getElementById('from-currency');
+    if (fromSelect) {
+        fromSelect.value = defaultCurrency;
+    }
         };
 
         // Loan Calculator
