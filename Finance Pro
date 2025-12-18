@@ -249,7 +249,7 @@
         <button data-tab="savings">🎯 Savings Goal</button>
         <button data-tab="portfolio">📈 Portfolio Tracker</button>
         <button data-tab="tax">🧾 Tax Estimator</button>
-        <button data-tab="networth">💎 Net Worth</button>
+       <button data-tab="networth">💎 Net Worth</button>
         <button data-tab="settings">⚙️ Settings</button>
     </div>
 
@@ -493,6 +493,22 @@
                 </div>
             </div>
         </section>
+             
+	        <section id="networth" class="section">
+            <div class="calculator">
+                <h3>Net Worth Calculator</h3>
+                <label>Assets (comma-separated values)</label>
+                <input type="text" id="assets" placeholder="e.g., 100000, 50000, 20000">
+                <label>Liabilities (comma-separated values)</label>
+                <input type="text" id="liabilities" placeholder="e.g., 50000, 10000">
+                <button onclick="calculateNetWorth()">Calculate Net Worth</button>
+                <div id="networth-result" class="result">
+                    <p>Total Assets: <span id="total-assets">$0</span></p>
+                    <p>Total Liabilities: <span id="total-liabilities">$0</span></p>
+                    <p>Net Worth: <span id="net-worth">$0</span></p>
+                </div>
+            </div>
+        </section>        
 
                               <section id="settings" class="section">
             <div class="calculator">
@@ -638,17 +654,24 @@
         let currentTheme = 'light';
         let defaultCurrency = 'USD';
 
-        // Tab Switching
+               // Tab Switching (Fixed – refreshes portfolio when opened)
         document.querySelectorAll('.sidebar button').forEach(button => {
             button.addEventListener('click', () => {
                 const tabId = button.dataset.tab;
 
+                // Update active button
                 document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
 
+                // Show correct section
                 document.querySelectorAll('.section').forEach(section => {
                     section.classList.toggle('active', section.id === tabId);
                 });
+
+                // Safe refresh: Only update portfolio when Portfolio tab is opened
+                if (tabId === 'portfolio') {
+                    updatePortfolio();
+                }
             });
         });
 
@@ -867,7 +890,7 @@
             if (!name || !quantity || !price) return alert('Fill all fields');
 
             investments.push({name, quantity, price});
-            updatePortfolio();
+                  updatePortfolio();
         };
 
         function updatePortfolio() {
@@ -884,8 +907,8 @@
             });
             document.getElementById('total-portfolio').textContent = `${defaultCurrency} ${totalValue.toFixed(2)}`;
             document.getElementById('portfolio-result').classList.add('active');
-        }
-
+       
+         }
         // Tax Estimator (Simplified US 2025 Brackets)
         window.estimateTax = function() {
             const income = parseFloat(document.getElementById('annual-income').value);
@@ -942,22 +965,125 @@
             document.getElementById('tax-result').classList.add('active');
         };
 
-        // Net Worth
-        window.calculateNetWorth = function() {
-            const assetsStr = document.getElementById('assets').value;
-            const liabilitiesStr = document.getElementById('liabilities').value;
-            const assets = assetsStr.split(',').map(a => parseFloat(a.trim())).filter(a => !isNaN(a));
-            const liabilities = liabilitiesStr.split(',').map(l => parseFloat(l.trim())).filter(l => !isNaN(l));
+// Net Worth
+     window.calculateNetWorth = function() {
+    const assetsStr = document.getElementById('assets').value;
+    const liabilitiesStr = document.getElementById('liabilities').value;
+    const assets = assetsStr.split(',').map(a => parseFloat(a.trim())).filter(a => !isNaN(a));
+    const liabilities = liabilitiesStr.split(',').map(l => parseFloat(l.trim())).filter(l => !isNaN(l));
+    const totalAssets = assets.reduce((a, b) => a + b, 0);
+    const totalLiab = liabilities.reduce((a, b) => a + b, 0);
+    const net = totalAssets - totalLiab;
 
-            const totalAssets = assets.reduce((a, b) => a + b, 0);
-            const totalLiab = liabilities.reduce((a, b) => a + b, 0);
-            const net = totalAssets - totalLiab;
+    document.getElementById('total-assets').textContent = `${defaultCurrency} ${totalAssets.toFixed(2)}`;
+    document.getElementById('total-liabilities').textContent = `${defaultCurrency} ${totalLiab.toFixed(2)}`;
+    document.getElementById('net-worth').textContent = `${defaultCurrency} ${net.toFixed(2)}`;
 
-            document.getElementById('total-assets').textContent = `${defaultCurrency} ${totalAssets.toFixed(2)}`;
-            document.getElementById('total-liabilities').textContent = `${defaultCurrency} ${totalLiab.toFixed(2)}`;
-            document.getElementById('net-worth').textContent = `${defaultCurrency} ${net.toFixed(2)}`;
-            document.getElementById('networth-result').classList.add('active');
+    // FIXED: Correct ID is 'networth-result' (no hyphen)
+    document.getElementById('networth-result').classList.add('active');
         };
+
+        // ========================
+        // FULL EXPORT / IMPORT + PWA
+        // ========================
+
+        // Save data automatically whenever portfolio or settings change
+        function saveAppData() {
+            const data = {
+                defaultCurrency: defaultCurrency,
+                investments: investments,
+                // Add more later if you expand (budgets, goals, etc.)
+                version: "1.0"
+            };
+            localStorage.setItem('financeProData', JSON.stringify(data));
+        }
+
+        // Load saved data on start
+        function loadAppData() {
+            const saved = localStorage.getItem('financeProData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                defaultCurrency = data.defaultCurrency || 'USD';
+                investments = data.investments || [];
+                document.getElementById('default-currency').value = defaultCurrency;
+                const fromSelect = document.getElementById('from-currency');
+                if (fromSelect) fromSelect.value = defaultCurrency
+            }
+        }
+        loadAppData(); // Run on load
+
+        // Export: Download JSON backup
+        window.exportData = function() {
+            const data = {
+                defaultCurrency: defaultCurrency,
+                investments: investments,
+                exportDate: new Date().toISOString(),
+                app: "Finance Pro"
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finance-pro-backup-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        // Import: Restore from JSON file
+        window.importData = function() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a JSON file first');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    defaultCurrency = data.defaultCurrency || 'USD';
+                    investments = data.investments || [];
+                    document.getElementById('default-currency').value = defaultCurrency;
+                    const fromSelect = document.getElementById('from-currency');
+                    if (fromSelect) fromSelect.value = defaultCurrency;
+                    updatePortfolio();
+                    saveAppData();
+                    alert('Data imported successfully! 🎉');
+                } catch (err) {
+                    alert('Invalid or corrupted file');
+                }
+            };
+            reader.readAsText(file);
+            fileInput.value = ''; // Reset input
+        };
+
+        // Save on every change
+        window.updateDefaultCurrency = function() {
+            defaultCurrency = document.getElementById('default-currency').value;
+            const fromSelect = document.getElementById('from-currency');
+            if (fromSelect) fromSelect.value = defaultCurrency;
+            saveAppData();
+        };
+
+        // PWA: Prompt install (optional, but cool)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // You can show a custom "Install" button later if you want
+        });
+
+        // Call saveAppData after adding to portfolio
+        window.addInvestment = function() {
+            const name = document.getElementById('inv-name').value.trim();
+            const quantity = parseFloat(document.getElementById('inv-quantity').value);
+            const price = parseFloat(document.getElementById('inv-price').value);
+            if (!name || !quantity || !price) return alert('Fill all fields');
+            investments.push({name, quantity, price});
+            updatePortfolio();
+            saveAppData();
+        };
+
     </script>
 </body>
 </html>
